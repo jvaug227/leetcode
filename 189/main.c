@@ -40,6 +40,13 @@ k=3, n=11
 1. 9 10 11 (4 5 6) 7 8 (1 2 3)
 2. 9 10 11 1 2 3 (7 8 (4) 5 6)
 
+0. 1 2 3 4 5 6 7 8 9 10 11
+1. 11 10 9 8 7 6 5 4 3 2 1
+2. 9 10 11 6 7 8 5 4 3 1 2
+3. 9 10 11 2 1 3 4 5 8 7 6
+4. 9 10 11 3 1 2 4 5 6 7 8
+
+
 
 k=5, n=11
 0. (1 2 3 4 5) 6 (7 8 9 10 11)
@@ -91,40 +98,24 @@ void swap(int* nums, uint32_t i1, uint32_t i2) {
     nums[i2] = temp;
 }
 
-//  Time Complexity: O(n+k)
-//  Extra Space Complexity: O(k), worst-case: O(n)
-void rotateDecent(int* nums, int numsSize, int k) {
-    if (k == 0 || numsSize == 0) return;
-    // [ (1 2 3) 4 5 6 a b (c 7 8) ]
-    // [ c 7 8 (4 5 6) a b (1 2 3) ]
-    // [ c 7 8 1 2 3 [a b (4 5 6)] ]
-
-
-    // [ c 7 8 4 5 (6 a b) (1 2 3) ]
-    // [ c 7 8 [(4 5 1) (2 3)] 6 a b ]
-    // [ c 7 8 1 2 3 4 5 6 a b ]
-    for (uint32_t j = 0; j < (numsSize/k)-1; j++) {
-        uint32_t start = j * k;
-        for (uint32_t i = 0; i < k; i++) {
-            swap(nums, start+i, start+i+k);
-        }
+void rotate_on_center(int*nums, int numsSize) {
+    uint32_t last = numsSize-1;
+    for (uint32_t i = 0; i < numsSize/2; i++) {
+        // printf("Swapping %i and %i\n", nums[i], nums[last-i]);
+        swap(nums,i, last-i);
     }
-
-    uint32_t offset = (numsSize/k)*(k-1);
-    uint32_t new_size = numsSize - offset;
-    int k2 = new_size - k;
-    rotateDecent(nums + offset, new_size, k2);
-    
 }
 
-// This is supposedly a "two-pointers problem", and can be solved in O(1) space.
-// So two indicies and no allocating a new array.
+// Space Complexity: O(1)
+// Time Complexity: O(N)
 void rotateGood(int* nums, int numsSize, int k) {
-    for (uint32_t i = 0; i < numsSize; i++) {
-        
-    }
+    if (numsSize <= 1) return;
+    k = k % numsSize;
+    rotate_on_center(nums, numsSize);
+    rotate_on_center(nums, k);
+    rotate_on_center(nums+k, numsSize-k);
 }
 
 void rotate(int* nums, int numsSize, int k) {
-    rotateDecent(nums, numsSize, k);
+    rotateGood(nums, numsSize, k);
 }
